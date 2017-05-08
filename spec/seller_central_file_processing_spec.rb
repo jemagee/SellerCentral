@@ -11,7 +11,7 @@ describe SellerCentral do
 			expect(@invoice).to be_an_instance_of SellerCentral
 		end
 
-		it "creates and empty hash called income" do
+		it "creates an empty hash as an instance variable called income" do
 			expect(@invoice.income).to be_an_instance_of Hash
 		end
 
@@ -25,6 +25,16 @@ describe SellerCentral do
 
 		it "should have an instance variable total set to 0" do
 			expect(@invoice.total).to eq 0
+		end
+
+		it "creates an empty hash instance variable called fees" do
+			expect(@invoice.fees).to be_an_instance_of Hash
+		end
+
+		it "should have a default value of 0 in the fees hash" do
+			@invoice.fees["subscription"] += 10
+			expect(@invoice.fees["subscription"]). to eq 10
+			expect(@invoice.fees["Commission"]).to eq 0
 		end
 	end
 
