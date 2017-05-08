@@ -44,5 +44,13 @@ class SellerCentral
 			end
 		end
 	end
+
+	def total_fees
+		debits = 0
+		@fees.each do |type, charge| 
+			debits += @fees[type]
+		end
+		debits
+	end
 end
 

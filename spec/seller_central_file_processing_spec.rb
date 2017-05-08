@@ -76,5 +76,9 @@ describe SellerCentral do
 		it "should sum the fees properly" do
 			expect(@invoice.fees["Commission"].round(2)).to eq -1443.15
 		end
+
+		it "should get all the fees properly" do
+			expect(@invoice.total_fees.round(2)).to eq -5373.1
+		end
 	end
 end
