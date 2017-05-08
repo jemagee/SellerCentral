@@ -36,5 +36,13 @@ class SellerCentral
 		end
 		revenue
 	end
+
+	def get_fees(file_name)
+		CSV.foreach(file_name, headers: true, converters: :numeric) do |row|
+			if row["amount-description"] != "Principal" && !row["amount-description"].nil?
+				@fees[row["amount-description"]] += row["amount"]
+			end
+		end
+	end
 end
 

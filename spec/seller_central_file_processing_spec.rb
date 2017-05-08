@@ -45,7 +45,7 @@ describe SellerCentral do
 		end
 	end
 
-	context "Processing the principles do"  do
+	context "Processing the principles"  do
 		before do
 			@invoice.get_principle("spec/fixtures/sc_test_file.csv")
 		end
@@ -65,6 +65,16 @@ describe SellerCentral do
 
 		it "should get the right total revenue" do
 			expect(@invoice.total_revenue.round(2)).to eq 9619.3
+		end
+	end
+
+	context "Processing the fees" do
+		before do
+			@invoice.get_fees("spec/fixtures/sc_test_file.csv")
+		end
+
+		it "should sum the fees properly" do
+			expect(@invoice.fees["Commission"].round(2)).to eq -1443.15
 		end
 	end
 end
