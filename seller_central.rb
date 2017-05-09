@@ -2,17 +2,23 @@ class SellerCentral
 
 	require 'csv'
 
-	attr_accessor :income, :fees, :total
+	attr_accessor :income, :fees, :total, :date
 
 	def initialize
 		@income = Hash.new{ |h, k| h[k] = {qty: 0, principle: 0, returns: 0} }
 		@fees = Hash.new(0)
 		@total = 0
+		@date = Date.new
 	end
 
 	def get_total(file_name)
 		data = CSV.read(file_name, headers: true, converters: :numeric)
 		@total = data[0]['total-amount']
+	end
+
+	def get_date(file_name)
+		data = CSV.read(file_name, headers: true, converters: :date)
+		@date = data[0]['settlement-end-date'].scan(/\d{4}-\d{2}-\d{2}/).first
 	end
 
 	def get_principle(file_name)
@@ -32,7 +38,7 @@ class SellerCentral
 	def total_revenue
 		revenue = 0
 		@income.each do |key, value|
-			revenue += @income[key][:principle] + @income[key][:returns]
+			revenue += value[:principle] + value[:returns]
 		end
 		revenue
 	end
@@ -48,9 +54,38 @@ class SellerCentral
 	def total_fees
 		debits = 0
 		@fees.each do |type, charge| 
-			debits += @fees[type]
+			debits += charge
 		end
 		debits
+	end
+
+	def total_calc
+		(total_revenue + total_fees).round(2)
+	end
+
+	def create_output
+		filename = "#{@date}_sales_report.csv"
+		CSV.open(filename, 'w') do |csv|
+			# get the relevant summary information in
+			display_date = Date.parse(@date).strftime('%-m/%d/%Y')
+			display_price = '%.2f' % @total
+			csv << ["","Amazon Seller Central Total for #{display_date}, totals $#{display_price}"]
+			#create the headers
+			csv << ['Item Number', 'Units Sold', 'Unit Price', 'Return Value', 'Total']
+			#populate the sales information
+			@income.each do |item, data|
+				sku = item
+				quantity = data[:qty]
+				revenue = data[:principle]
+				returns = data[:returns]
+				csv << [sku, quantity, (revenue/quantity).round(6), returns, revenue.round(2)]
+			end
+			#populate the fees
+			csv << ['Fee', 'Fee Total']
+			@fees.each do |fee, total|
+				csv <<[fee, total.round(2)]
+			end
+		end
 	end
 end
 

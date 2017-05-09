@@ -27,6 +27,10 @@ describe SellerCentral do
 			expect(@invoice.total).to eq 0
 		end
 
+		it "should have an instance variable date" do
+			expect(@invoice.date).to be_an_instance_of Date 
+		end
+
 		it "creates an empty hash instance variable called fees" do
 			expect(@invoice.fees).to be_an_instance_of Hash
 		end
@@ -42,6 +46,14 @@ describe SellerCentral do
 		it "should get the right total" do
 			@invoice.get_total("spec/fixtures/sc_test_file.csv")
 			expect(@invoice.total).to eq 4246.2
+		end
+	end
+
+	describe "getting the invoice date" do
+		it "should have an invoice date of 3/10/2017" do
+			@invoice.get_date("spec/fixtures/sc_test_file.csv")
+			expect(@invoice.date).to eq '2017-03-10'
+			
 		end
 	end
 
@@ -79,6 +91,33 @@ describe SellerCentral do
 
 		it "should get all the fees properly" do
 			expect(@invoice.total_fees.round(2)).to eq -5373.1
+		end
+	end
+
+	context "Verify the Total is the Total" do
+		before do
+			@invoice.get_total("spec/fixtures/sc_test_file.csv")
+			@invoice.get_fees("spec/fixtures/sc_test_file.csv")
+			@invoice.get_principle("spec/fixtures/sc_test_file.csv")
+		end
+
+		it "should total out properly" do
+			expect(@invoice.total_calc).to eq @invoice.total
+		end
+	end
+
+	context "Verify the output file exists." do
+		before do
+			@invoice.get_total("spec/fixtures/sc_test_file.csv")
+			@invoice.get_fees("spec/fixtures/sc_test_file.csv")
+			@invoice.get_principle("spec/fixtures/sc_test_file.csv")
+			@invoice.get_date("spec/fixtures/sc_test_file.csv")
+			@invoice.create_output
+		end
+
+		it "should have the right file name" do
+			filename = "#{@invoice.date}_sales_report.csv"
+			expect(File.exist?("#{filename}")).to eq true
 		end
 	end
 end
