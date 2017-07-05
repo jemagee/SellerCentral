@@ -78,7 +78,11 @@ class SellerCentral
 				quantity = data[:qty]
 				revenue = data[:principle]
 				returns = data[:returns]
-				csv << [sku, quantity, (revenue/quantity).round(6), returns, revenue.round(2)]
+				if revenue != 0
+					csv << [sku, quantity, (revenue/quantity).round(5), returns, revenue.round(2)]
+				else
+					csv << [sku, quantity, 0, returns, revenue.round(2)]
+				end
 			end
 			#populate the fees
 			csv << ['Fee', 'Fee Total']
@@ -86,6 +90,17 @@ class SellerCentral
 				csv <<[fee, total.round(2)]
 			end
 		end
+	end
+
+	def run_file(fileName)
+		self.get_total(fileName)
+		self.get_date(fileName)
+		self.get_principle(fileName)
+		self.get_fees(fileName)
+		self.total_revenue
+		self.total_fees
+		self.total_calc
+		self.create_output
 	end
 end
 
